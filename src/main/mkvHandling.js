@@ -64,10 +64,12 @@ async function retrieveMkvInfo(
 
     let out;
     try {
-        const {stdout, stderr} = await promisifiedExecFile(
-            mkvMergeExecutable,
-            ['--identify', mkv, '--identification-format', format],
-        );
+        const {stdout, stderr} = await promisifiedExecFile(mkvMergeExecutable, [
+            '--identify',
+            mkv,
+            '--identification-format',
+            format,
+        ]);
 
         if (json) {
             out = JSON.parse(stdout);
@@ -149,14 +151,19 @@ async function processMkvs(
                     true,
                     mkvMergeExecutable,
                 );
+                console.log(sourceInfo);
                 let sourceFontAttachmentIds = await listIds(
                     sourceInfo.attachments,
                     (item) => {
-                        return (
-                            item.content_type === 'application/x-truetype-font'
-                        );
+                        return [
+                            'application/x-truetype-font',
+                            'application/vnd.ms-opentype',
+                            'application/x-font-ttf',
+                            'application/x-font-opentype',
+                        ].find((font) => item.content_type === font);
                     },
                 );
+                console.log(sourceFontAttachmentIds);
                 if (sourceFontAttachmentIds.length > 0) {
                     fontArguments.push('--attachments');
                     fontArguments.push(sourceFontAttachmentIds.join(','));
@@ -245,7 +252,7 @@ async function processMkvs(
         console.log(error);
     }
 
-    console.log(argumentList);
+    console.log('argument list', argumentList);
 
     let sushiArgs = [];
     if (settings.sushiArgs) {
@@ -276,6 +283,17 @@ async function processMkvs(
                 }
             },
             sushiExecutable,
+        );
+    } else if (fs.lstatSync(source).isFile() && argumentList.length > 0) {
+        execMkvMerge(
+            outputName,
+            argumentList,
+            dataCallback,
+            (mergeCode) => {
+                console.log('MKVMerge exit code: ', mergeCode);
+                exitCallback(undefined, mergeCode);
+            },
+            mkvMergeExecutable,
         );
     } else {
         exitCallback(undefined, undefined);
