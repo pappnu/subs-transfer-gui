@@ -4,6 +4,7 @@ import {EditableList} from '../general/editableList';
 import {SettingCheckbox} from '../general/settingCheckbox';
 import {SettingTextArea} from '../general/settingTextArea';
 import {StyleableButton} from '../general/StyleableButton';
+import {AutoScrollingTextArea} from '../general/autoScrollingTextArea';
 
 export class Processing extends React.Component {
     render() {
@@ -116,9 +117,10 @@ export class Processing extends React.Component {
                     />
                 </div>
                 <div style={this.props.style.layout.logContainer}>
-                    <textarea
+                    <AutoScrollingTextArea
                         style={this.props.style.settings.log}
-                        disabled={true}
+                        disabled={false}
+                        readOnly={true}
                         value={this.props.log}
                     />
                 </div>
