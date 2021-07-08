@@ -2,8 +2,8 @@ export default {
     rootContainer: {
         display: 'flex',
         flexDirection: 'column',
+        flex: 1,
         height: '100%',
-        backgroundColor: '#121212',
         color: 'rgba(255,255,255,0.87)',
     },
     loadingContainer: {

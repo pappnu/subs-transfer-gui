@@ -44,8 +44,6 @@ async function execMkvMerge(
     args.push(outputName);
     args = args.concat(argumentList);
 
-    // Embed sushi subtitles here?
-
     const childProcess = spawn(mkvMergeExecutable, args);
     childProcess.stdout.on('data', onData);
     childProcess.stderr.on('data', onData);
@@ -81,7 +79,7 @@ async function retrieveMkvInfo(
     return out;
 }
 
-async function listIds(list, filter) {
+function listIds(list, filter) {
     let filtered = list.filter(filter);
 
     return filtered.map((item) => {
@@ -113,140 +111,209 @@ async function processMkvs(
         path.basename(target, path.extname(target)) + path.extname(target),
     );
 
+    let sourceAudioId;
+    let sourceSubtitlesId;
+    let targetAudioId;
+
     try {
-        // TODO: Copy and rename subtitles from source directories
-        if ('subDirCopy' in settings && fs.lstatSync(source).isDirectory()) {
-            let subs = await fs.promises.readdir(source);
-            subs = subs.filter(
-                (file) =>
-                    path.extname(file) === '.ass' ||
-                    path.extname(file) === '.srt',
+        const sourceMkvInfo = await retrieveMkvInfo(
+            source,
+            true,
+            mkvMergeExecutable,
+        );
+        const targetMkvInfo = await retrieveMkvInfo(
+            target,
+            true,
+            mkvMergeExecutable,
+        );
+
+        if (settings.sushi && settings.autoSushiArgs) {
+            const audioParams = JSON.parse(settings.autoSushiAudio);
+            const subtitlesParams = JSON.parse(settings.autoSushiSubtitles);
+
+            sourceAudioId = Math.min(
+                ...listIds(sourceMkvInfo.tracks, (item) => {
+                    return item.type === 'audio' &&
+                        audioParams.languages.some((lang) =>
+                            item.properties.language.toLowerCase().includes(lang.toLowerCase()),
+                        ) &&
+                        (audioParams.names.length > 0
+                            ? audioParams.names.some((name) =>
+                                  item.properties.track_name.toLowerCase().includes(name.toLowerCase()),
+                              )
+                            : true);
+                }),
             );
-            subs = subs.map((file) => path.join(attachmentsPath, file));
+            if (sourceAudioId === Infinity) {
+                sourceAudioId = undefined;
+            }
+            sourceSubtitlesId = Math.min(
+                ...listIds(sourceMkvInfo.tracks, (item) => {
+                    return item.type === 'subtitles' &&
+                        subtitlesParams.languages.some((lang) =>
+                            item.properties.language.toLowerCase().includes(lang.toLowerCase()),
+                        ) &&
+                        (subtitlesParams.names.length > 0
+                            ? subtitlesParams.names.some((name) =>
+                                  item.properties.track_name.toLowerCase().includes(name.toLowerCase()),
+                              )
+                            : true);
+                }),
+            );
+            if (sourceSubtitlesId === Infinity) {
+                sourceSubtitlesId = undefined;
+            }
 
-            console.log(subs);
-
-            for (let i = 0; i < subs.length; i++) {
-                let dest = path.join(
-                    workDirectory,
-                    path
-                        .basename(subs[i])
-                        .substr(
-                            0,
-                            path.basename(subs[i]).lastIndexOf('.') + 1,
-                        ) +
-                        i +
-                        '.ass',
-                );
-                fs.copyFile(subs[i], dest);
+            targetAudioId = Math.min(
+                ...listIds(targetMkvInfo.tracks, (item) => {
+                    return item.type === 'audio' &&
+                        audioParams.languages.some((lang) =>
+                            item.properties.language.toLowerCase().includes(lang.toLowerCase()),
+                        ) &&
+                        (audioParams.names.length > 0
+                            ? audioParams.names.some((name) =>
+                                  item.properties.track_name.toLowerCase().includes(name.toLowerCase()),
+                              )
+                            : true);
+                }),
+            );
+            if (targetAudioId === Infinity) {
+                targetAudioId = undefined;
             }
         }
 
-        // Copy fonts from subtitle source mkv or folder
-        let fontArguments = [];
-        if (settings.copyFonts) {
-            if (fs.lstatSync(source).isFile()) {
-                let sourceInfo = await retrieveMkvInfo(
-                    source,
-                    true,
-                    mkvMergeExecutable,
-                );
-                console.log(sourceInfo);
-                let sourceFontAttachmentIds = await listIds(
-                    sourceInfo.attachments,
-                    (item) => {
-                        return [
-                            'application/x-truetype-font',
-                            'application/vnd.ms-opentype',
-                            'application/x-font-ttf',
-                            'application/x-font-opentype',
-                        ].find((font) => item.content_type === font);
-                    },
-                );
-                console.log(sourceFontAttachmentIds);
-                if (sourceFontAttachmentIds.length > 0) {
-                    fontArguments.push('--attachments');
-                    fontArguments.push(sourceFontAttachmentIds.join(','));
-
-                    fontArguments.push('--no-audio');
-                    fontArguments.push('--no-video');
-                    fontArguments.push('--no-subtitles');
-                    fontArguments.push('--no-buttons');
-                    fontArguments.push('--no-track-tags');
-                    fontArguments.push('--no-chapters');
-                    fontArguments.push('--no-global-tags');
-
-                    fontArguments.push(source);
-                }
-            } else {
-                let attachmentsPath = path.join(source, 'attachments');
-                let fonts = await fs.promises.readdir(attachmentsPath);
-                fonts = fonts.filter(
+        if (settings.mux) {
+            // TODO: Copy and rename subtitles from source directories
+            if (
+                'subDirCopy' in settings &&
+                fs.lstatSync(source).isDirectory()
+            ) {
+                let subs = await fs.promises.readdir(source);
+                subs = subs.filter(
                     (file) =>
-                        path.extname(file) === '.ttf' ||
-                        path.extname(file) === '.otf' ||
-                        path.extname(file) === '.TTF' ||
-                        path.extname(file) === '.OTF',
+                        path.extname(file) === '.ass' ||
+                        path.extname(file) === '.srt',
                 );
-                fonts = fonts.map((file) => path.join(attachmentsPath, file));
+                subs = subs.map((file) => path.join(attachmentsPath, file));
 
-                for (let font of fonts) {
-                    fontArguments.push('--attachment-mime-type');
-                    fontArguments.push('application/x-truetype-font');
-                    fontArguments.push('--attach-file');
-                    fontArguments.push(font);
+                console.log(subs);
+
+                for (let i = 0; i < subs.length; i++) {
+                    let dest = path.join(
+                        workDirectory,
+                        path
+                            .basename(subs[i])
+                            .substr(
+                                0,
+                                path.basename(subs[i]).lastIndexOf('.') + 1,
+                            ) +
+                            i +
+                            '.ass',
+                    );
+                    fs.copyFile(subs[i], dest);
                 }
             }
-        }
 
-        let mkvInfo;
-        if (settings.sushiArgs || !settings.targetSubs) {
-            mkvInfo = await retrieveMkvInfo(target, true, mkvMergeExecutable);
-        }
+            // Copy fonts from subtitle source mkv or folder
+            let fontArguments = [];
+            if (settings.copyFonts) {
+                if (fs.lstatSync(source).isFile()) {
+                    let sourceFontAttachmentIds = listIds(
+                        sourceMkvInfo.attachments,
+                        (item) => {
+                            return [
+                                'application/x-truetype-font',
+                                'application/vnd.ms-opentype',
+                                'application/x-font-ttf',
+                                'application/x-font-opentype',
+                            ].find((font) => item.content_type === font);
+                        },
+                    );
+                    console.log(sourceFontAttachmentIds);
+                    if (sourceFontAttachmentIds.length > 0) {
+                        fontArguments.push('--attachments');
+                        fontArguments.push(sourceFontAttachmentIds.join(','));
 
-        // Don't copy excluded audio languages from the input
-        let audioTrackArguments = [];
-        if (mkvInfo && settings.audioLanguages) {
-            const excludeLanguages = settings.audioLanguages
-                .split(',')
-                .map((item) => item.trim());
-            let audioTrackIds = await listIds(mkvInfo.tracks, (item) => {
-                return (
-                    item.type === 'audio' &&
-                    excludeLanguages.includes(item.properties.language)
-                );
-            });
-            if (audioTrackIds.length > 0) {
-                audioTrackArguments.push('--audio-tracks');
-                audioTrackArguments.push('!' + audioTrackIds.join(','));
+                        fontArguments.push('--no-audio');
+                        fontArguments.push('--no-video');
+                        fontArguments.push('--no-subtitles');
+                        fontArguments.push('--no-buttons');
+                        fontArguments.push('--no-track-tags');
+                        fontArguments.push('--no-chapters');
+                        fontArguments.push('--no-global-tags');
+
+                        fontArguments.push(source);
+                    }
+                } else {
+                    let attachmentsPath = path.join(source, 'attachments');
+                    let fonts = await fs.promises.readdir(attachmentsPath);
+                    fonts = fonts.filter(
+                        (file) =>
+                            path.extname(file) === '.ttf' ||
+                            path.extname(file) === '.otf' ||
+                            path.extname(file) === '.TTF' ||
+                            path.extname(file) === '.OTF',
+                    );
+                    fonts = fonts.map((file) =>
+                        path.join(attachmentsPath, file),
+                    );
+
+                    for (let font of fonts) {
+                        fontArguments.push('--attachment-mime-type');
+                        fontArguments.push('application/x-truetype-font');
+                        fontArguments.push('--attach-file');
+                        fontArguments.push(font);
+                    }
+                }
             }
-        }
 
-        if (fontArguments.length > 0 || audioTrackArguments.length > 0) {
-            argumentList = argumentList.concat(fontArguments);
-            argumentList = argumentList.concat(audioTrackArguments);
+            // Don't copy excluded audio languages from the input
+            let audioTrackArguments = [];
+            if (targetMkvInfo && settings.audioLanguages) {
+                const excludeLanguages = settings.audioLanguages
+                    .split(',')
+                    .map((item) => item.trim());
+                let audioTrackIds = listIds(targetMkvInfo.tracks, (item) => {
+                    return (
+                        item.type === 'audio' &&
+                        excludeLanguages.includes(item.properties.language)
+                    );
+                });
+                if (audioTrackIds.length > 0) {
+                    audioTrackArguments.push('--audio-tracks');
+                    audioTrackArguments.push('!' + audioTrackIds.join(','));
+                }
+            }
 
-            if (!settings.targetSubs) {
-                // Don't copy existing subtitles from the input
-                argumentList.push('--no-subtitles');
+            if (fontArguments.length > 0 || audioTrackArguments.length > 0) {
+                argumentList = argumentList.concat(fontArguments);
+                argumentList = argumentList.concat(audioTrackArguments);
 
-                // Don't copy existing fonts from the input
-                let inputFontAttachmentIds = await listIds(
-                    mkvInfo.attachments,
-                    (item) => {
-                        return (
-                            item.content_type === 'application/x-truetype-font'
+                if (!settings.targetSubs) {
+                    // Don't copy existing subtitles from the input
+                    argumentList.push('--no-subtitles');
+
+                    // Don't copy existing fonts from the input
+                    let inputFontAttachmentIds = listIds(
+                        targetMkvInfo.attachments,
+                        (item) => {
+                            return (
+                                item.content_type ===
+                                'application/x-truetype-font'
+                            );
+                        },
+                    );
+                    if (inputFontAttachmentIds.length > 0) {
+                        argumentList.push('--attachments');
+                        argumentList.push(
+                            '!' + inputFontAttachmentIds.join(','),
                         );
-                    },
-                );
-                if (inputFontAttachmentIds.length > 0) {
-                    argumentList.push('--attachments');
-                    argumentList.push('!' + inputFontAttachmentIds.join(','));
+                    }
                 }
-            }
 
-            // File specific arguments have to be specified before the file itself
-            argumentList.push(target);
+                // File specific arguments have to be specified before the file itself
+                argumentList.push(target);
+            }
         }
     } catch (error) {
         console.log(error);
@@ -254,7 +321,23 @@ async function processMkvs(
 
     console.log('argument list', argumentList);
 
+    console.log('Sushi audio track', sourceAudioId);
+    console.log('Sushi subtitle track', sourceSubtitlesId);
+    console.log('Sushi destination audio track', targetAudioId);
+
     let sushiArgs = [];
+    if (sourceAudioId) {
+        sushiArgs.push('--src-audio');
+        sushiArgs.push(sourceAudioId.toString());
+    }
+    if (sourceSubtitlesId) {
+        sushiArgs.push('--src-script');
+        sushiArgs.push(sourceSubtitlesId.toString());
+    }
+    if (targetAudioId) {
+        sushiArgs.push('--dst-audio');
+        sushiArgs.push(targetAudioId);
+    }
     if (settings.sushiArgs) {
         sushiArgs = settings.sushiArgs.split(' ');
     }

@@ -16,9 +16,11 @@ export class Processing extends React.Component {
         );
 
         const booleanSettings = [
-            {id: 'sushi', text: ' Run Sushi:'},
+            {id: 'sushi', text: 'Run Sushi:'},
+            {id: 'autoSushiArgs', text: 'Auto track selection:'},
+            {id: 'mux', text: 'Mux targets:'},
             {id: 'copyFonts', text: 'Copy Fonts:'},
-            {id: 'targetSubs', text: 'Mux target subs:'},
+            {id: 'targetSubs', text: 'Include target subs:'},
         ];
 
         const booleanSettingComponents = booleanSettings.map((item) => (
@@ -37,6 +39,8 @@ export class Processing extends React.Component {
         ));
 
         const textAreaSettings = [
+            {id: 'autoSushiAudio', text: 'Audio languages and names to seek when looking for audio for sushi:'},
+            {id: 'autoSushiSubtitles', text: 'Subtitle languages and names to seek when looking for subtitles for sushi:'},
             {id: 'sushiArgs', text: 'Sushi extra arguments:'},
             {id: 'audioLanguages', text: 'Target audio languages to not mux:'},
         ];
@@ -104,8 +108,10 @@ export class Processing extends React.Component {
                         instructions={'Drop files here'}
                     />
                 </div>
-                <div style={this.props.style.layout.settingsContainer}>
+                <div style={this.props.style.layout.booleanSettingsContainer}>
                     {booleanSettingComponents}
+                </div>
+                <div style={this.props.style.layout.textSettingsContainer}>
                     {textAreaSettingComponents}
                 </div>
                 <div style={this.props.style.layout.settingsContainer}>

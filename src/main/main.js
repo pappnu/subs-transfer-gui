@@ -15,6 +15,9 @@ function createWindow() {
         height: 600,
         webPreferences: {
             preload: `${__dirname}/../preload/preload.js`,
+            defaultFontFamily: {
+                standard: 'Segoe UI',
+            },
         },
         frame: false,
     });
@@ -69,7 +72,7 @@ ipcMain.on('save-state', (event, arg) => {
 ipcMain.on('get-state', async (event, arg) => {
     const savedState = store.get('savedState', arg.default);
     event.reply('get-state', savedState);
-})
+});
 
 ipcMain.handle('select-files', async (event, arg) => {
     const paths = await dialog.showOpenDialog({
