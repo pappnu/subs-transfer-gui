@@ -3,6 +3,8 @@ export default {
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
+        backgroundColor: '#121212',
+        overflow: 'auto',
     },
     textSettingContainer: {
         display: 'flex',
@@ -12,4 +14,9 @@ export default {
         paddingTop: '4px',
         paddingBottom: '4px',
     },
+    textSettingHeaderContainer: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+    }
 }

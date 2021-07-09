@@ -74,13 +74,22 @@ ipcMain.on('get-state', async (event, arg) => {
     event.reply('get-state', savedState);
 });
 
-ipcMain.handle('select-files', async (event, arg) => {
-    const paths = await dialog.showOpenDialog({
-        filters: [{name: 'Matroska', extensions: ['mkv']}],
-        properties: ['openFile', 'multiSelections'],
-    });
-    return paths;
-});
+ipcMain.handle(
+    'select-files',
+    async (
+        event,
+        arg = {
+            filters: [{name: 'Matroska', extensions: ['mkv']}],
+            properties: ['openFile', 'multiSelections'],
+        },
+    ) => {
+        const paths = await dialog.showOpenDialog({
+            filters: arg.filters,
+            properties: arg.properties,
+        });
+        return paths;
+    },
+);
 
 ipcMain.on('process-mkv', async (event, arg) => {
     const log = (data) => {

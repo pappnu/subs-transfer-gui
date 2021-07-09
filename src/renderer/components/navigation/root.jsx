@@ -48,8 +48,10 @@ export class Root extends React.Component {
                 sushi: true,
                 autoSushiArgs: true,
                 mux: true,
-                autoSushiAudio: '{"languages": ["jpn", "japan", "jap"], "names": []}',
-                autoSushiSubtitles: '{"languages": ["eng", "english"], "names": ["dialogue", "full"]}',
+                autoSushiAudio:
+                    '{"languages": ["jpn", "japan", "jap"], "names": []}',
+                autoSushiSubtitles:
+                    '{"languages": ["eng", "english"], "names": ["dialogue", "full"]}',
                 sushiArgs: '',
                 audioLanguages: '',
             },
@@ -123,6 +125,14 @@ export class Root extends React.Component {
         const newState = this.state.executables;
         newState[executable] = newPath;
         this.setState({executables: newState});
+    };
+
+    pickExecutablePath = async (executable) => {
+        const result = await window.ipcRenderer.invoke('select-files', {
+            filters: [{name: 'Executable', extensions: ['exe']}],
+            properties: ['openFile'],
+        });
+        this.changeExecutablePath(result.filePaths[0], executable);
     };
 
     startProcessing = () => {
@@ -300,6 +310,7 @@ export class Root extends React.Component {
                                 style={this.state.styles.settings}
                                 onTextAreaChange={this.changeExecutablePath}
                                 textAreaValues={this.state.executables}
+                                pickExecutablePath={this.pickExecutablePath}
                             />
                         </Route>
                         <Route path="/">
