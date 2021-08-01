@@ -1,4 +1,5 @@
 const process = require('process');
+const path = require('path');
 
 const {app, BrowserWindow, ipcMain, dialog} = require('electron');
 const Store = require('electron-store');
@@ -14,7 +15,10 @@ function createWindow() {
         width: 800,
         height: 600,
         webPreferences: {
-            preload: `${__dirname}/../preload/preload.js`,
+            preload:
+                process.env.NODE_ENV === 'development'
+                    ? `${__dirname}/../preload/preload.js`
+                    : `${__dirname}/../../preload/dist/preload.js`,
             defaultFontFamily: {
                 standard: 'Segoe UI',
             },
@@ -26,11 +30,13 @@ function createWindow() {
         handleClose(event, readyToClose);
     });
 
+    const port = process.env.PORT || 3000;
+
     if (process.env.NODE_ENV === 'development') {
-        win.loadURL('http://localhost:3000');
+        win.loadURL(`http://localhost:${port}`);
         win.webContents.openDevTools();
     } else {
-        win.loadFile('../../dist/index.html');
+        win.loadFile(path.join(__dirname, '../../renderer/dist/index.html'));
     }
 }
 

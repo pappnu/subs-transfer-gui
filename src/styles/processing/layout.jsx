@@ -55,7 +55,7 @@ export default {
     logContainer: {
         display: 'flex',
         flexDirection: 'column',
-        flex: 1,
+        flexGrow: 1,
         margin: '4px',
     },
     textSettingContainer: {
@@ -86,5 +86,5 @@ export default {
         width: '100%',
         justifyContent: 'center',
         alignItems: 'center',
-    }
+    },
 };

@@ -127,8 +127,6 @@ async function processMkvs(
             mkvMergeExecutable,
         );
 
-        console.log(JSON.stringify(sourceMkvInfo, null, 2));
-
         if (settings.sushi && settings.autoSushiArgs) {
             const audioParams = JSON.parse(settings.autoSushiAudio);
             const subtitlesParams = JSON.parse(settings.autoSushiSubtitles);

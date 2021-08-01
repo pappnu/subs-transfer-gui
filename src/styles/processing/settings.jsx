@@ -6,6 +6,8 @@ export default {
         backgroundColor: '#1a202d',
         color: 'rgba(255,255,255,0.87)',
         borderColor: 'rgba(255,255,255,0.4)',
+        resize: 'vertical',
+        minHeight: '30px',
     },
     log: {
         flexGrow: 1,
@@ -13,7 +15,8 @@ export default {
         color: 'rgba(255,255,255,0.87)',
         borderColor: 'rgba(255,255,255,0.4)',
         marginTop: '4px',
-        resize: 'none',
+        resize: 'vertical',
+        minHeight: '200px',
     },
     button: {
         default: {
