@@ -67,7 +67,7 @@ async function retrieveMkvInfo(
             mkv,
             '--identification-format',
             format,
-        ]);
+        ], {maxBuffer: 5242880}); // 5 MB, process is killed if output exceeds this
 
         if (json) {
             out = JSON.parse(stdout);
@@ -126,6 +126,8 @@ async function processMkvs(
             true,
             mkvMergeExecutable,
         );
+
+        console.log(JSON.stringify(sourceMkvInfo, null, 2));
 
         if (settings.sushi && settings.autoSushiArgs) {
             const audioParams = JSON.parse(settings.autoSushiAudio);
@@ -196,8 +198,6 @@ async function processMkvs(
                 );
                 subs = subs.map((file) => path.join(attachmentsPath, file));
 
-                console.log(subs);
-
                 for (let i = 0; i < subs.length; i++) {
                     let dest = path.join(
                         workDirectory,
@@ -229,7 +229,7 @@ async function processMkvs(
                             ].find((font) => item.content_type === font);
                         },
                     );
-                    console.log(sourceFontAttachmentIds);
+
                     if (sourceFontAttachmentIds.length > 0) {
                         fontArguments.push('--attachments');
                         fontArguments.push(sourceFontAttachmentIds.join(','));
