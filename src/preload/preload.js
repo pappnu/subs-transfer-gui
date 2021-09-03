@@ -12,6 +12,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
         let validChannels = [
             'close',
             'process-mkv',
+            'stop-process',
             'minimize-window',
             'max-unmax-window',
             'is-window-maximized',

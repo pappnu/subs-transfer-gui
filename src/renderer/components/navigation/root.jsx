@@ -137,36 +137,45 @@ export class Root extends React.Component {
 
     startProcessing = () => {
         if (this.state.targetPaths.length > 0) {
-            this.setState({processing: true});
-            const sourcePaths = [...this.state.sourcePaths].reverse();
-            const targetPaths = [...this.state.targetPaths].reverse();
+            this.setState({processing: true}, () => {
+                const sourcePaths = [...this.state.sourcePaths].reverse();
+                const targetPaths = [...this.state.targetPaths].reverse();
 
-            const iterate = () => {
-                if (targetPaths.length > 0) {
-                    let source = sourcePaths.pop();
-                    let target = targetPaths.pop();
-                    window.ipcRenderer.send('process-mkv', {
-                        source: source,
-                        target: target,
-                        settings: this.state.settings,
-                        sushi: this.state.executables.sushiPath,
-                        mkvmerge: this.state.executables.mkvmergePath,
-                    });
-                } else {
-                    window.ipcRenderer.removeListener('process-mkv', iterate);
-                    this.endProcessing();
-                }
-            };
+                const iterate = () => {
+                    if (targetPaths.length > 0 && this.state.processing) {
+                        let source = sourcePaths.pop();
+                        let target = targetPaths.pop();
+                        window.ipcRenderer.send('process-mkv', {
+                            source: source,
+                            target: target,
+                            settings: this.state.settings,
+                            sushi: this.state.executables.sushiPath,
+                            mkvmerge: this.state.executables.mkvmergePath,
+                        });
+                    } else {
+                        window.ipcRenderer.removeListener(
+                            'process-mkv',
+                            iterate,
+                        );
+                        this.setState({processing: false});
+                    }
+                };
 
-            window.ipcRenderer.on('process-mkv', iterate);
+                window.ipcRenderer.on('process-mkv', iterate);
 
-            iterate();
+                iterate();
+            });
         }
     };
 
-    endProcessing = () => {
+    stopProcessing = () => {
+        window.ipcRenderer.send('stop-process');
         this.setState({processing: false});
     };
+
+    handleStopProcess = () => {
+
+    }
 
     log = (data) => {
         const newLog = this.state.log + data;
@@ -317,6 +326,7 @@ export class Root extends React.Component {
                             <Processing
                                 style={this.state.styles.processing}
                                 startProcessing={this.startProcessing}
+                                stopProcessing={this.stopProcessing}
                                 handleSourceDrop={this.handleSourceDrop}
                                 handleTargetDrop={this.handleTargetDrop}
                                 addSources={this.addSources}

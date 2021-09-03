@@ -4,11 +4,13 @@ const path = require('path');
 const {app, BrowserWindow, ipcMain, dialog} = require('electron');
 const Store = require('electron-store');
 
-const {processMkvs} = require('./mkvHandling');
+const {MkvProcess} = require('./mkvProcess');
+
+const store = new Store();
 
 let win;
 let readyToClose = false;
-const store = new Store();
+let activeProcess;
 
 function createWindow() {
     win = new BrowserWindow({
@@ -102,17 +104,17 @@ ipcMain.on('process-mkv', async (event, arg) => {
         event.reply('log', data.toString());
     };
     const end = () => {
+        activeProcess = undefined;
         event.reply('process-mkv', true);
     };
-    processMkvs(
-        arg.source,
-        arg.target,
-        arg.settings,
-        log,
-        end,
-        arg.sushi,
-        arg.mkvmerge,
-    );
+    activeProcess = new MkvProcess(arg.source, arg.target);
+    activeProcess.processMkvs(arg.settings, log, end, arg.sushi, arg.mkvmerge);
+});
+
+ipcMain.on('stop-process', async (event, arg) => {
+    if (activeProcess) {
+        activeProcess.abortProcess();
+    }
 });
 
 ipcMain.on('minimize-window', (event, arg) => {

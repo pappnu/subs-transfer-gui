@@ -19,7 +19,7 @@ export default defineConfig({
         rollupOptions: {
             input: {
                 main: path.join(__dirname, 'main.js'),
-                mkvHandling: path.join(__dirname, 'mkvHandling.js'),
+                mkvProcess: path.join(__dirname, 'mkvProcess.js'),
             },
             external: ['electron', ...builtinModules],
             output: {

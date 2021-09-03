@@ -39,8 +39,14 @@ export class Processing extends React.Component {
         ));
 
         const textAreaSettings = [
-            {id: 'autoSushiAudio', text: 'Audio languages and names to seek when looking for audio for sushi:'},
-            {id: 'autoSushiSubtitles', text: 'Subtitle languages and names to seek when looking for subtitles for sushi:'},
+            {
+                id: 'autoSushiAudio',
+                text: 'Audio languages and names to seek when looking for audio for sushi:',
+            },
+            {
+                id: 'autoSushiSubtitles',
+                text: 'Subtitle languages and names to seek when looking for subtitles for sushi:',
+            },
             {id: 'sushiArgs', text: 'Sushi extra arguments:'},
             {id: 'audioLanguages', text: 'Target audio languages to not mux:'},
         ];
@@ -116,10 +122,18 @@ export class Processing extends React.Component {
                 </div>
                 <div style={this.props.style.layout.settingsContainer}>
                     <StyleableButton
-                        style={this.props.style.settings.button}
-                        onClick={this.props.startProcessing}
-                        disabled={this.props.processing}
-                        text={'Start'}
+                        style={
+                            this.props.processing
+                                ? this.props.style.settings.stopButton
+                                : this.props.style.settings.startButton
+                        }
+                        onClick={
+                            this.props.processing
+                                ? this.props.stopProcessing
+                                : this.props.startProcessing
+                        }
+                        disabled={false}
+                        text={this.props.processing ? 'Stop' : 'Start'}
                     />
                 </div>
                 <div style={this.props.style.layout.logContainer}>
