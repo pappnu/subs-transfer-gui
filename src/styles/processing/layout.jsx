@@ -5,6 +5,7 @@ export default {
         flex: 1,
         backgroundColor: '#121212',
         overflow: 'auto',
+        overflowX: 'auto',
     },
     fileInputsContainer: {
         display: 'flex',
@@ -49,7 +50,8 @@ export default {
     },
     textSettingsContainer: {
         display: 'flex',
-        flexDirection: 'column',
+        flexDirection: 'row',
+        flexWrap: 'wrap',
         margin: '4px',
     },
     logContainer: {
@@ -60,9 +62,11 @@ export default {
     },
     textSettingContainer: {
         display: 'flex',
+        flex: 1,
         flexDirection: 'column',
-        paddingLeft: '8px',
-        paddingRight: '8px',
+        minWidth: '300px',
+        paddingLeft: '4px',
+        paddingRight: '4px',
         paddingTop: '4px',
         paddingBottom: '4px',
     },

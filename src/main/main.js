@@ -16,6 +16,8 @@ function createWindow() {
     win = new BrowserWindow({
         width: 800,
         height: 600,
+        minWidth: 300,
+        minHeight: 300,
         webPreferences: {
             preload:
                 process.env.NODE_ENV === 'development'

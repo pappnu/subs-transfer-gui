@@ -5,7 +5,7 @@ import {Processing} from '../processing/processing';
 import {Settings} from '../settings/settings';
 import {naturalSort} from '../utility/sorting';
 import {StyleableNavLink} from '../general/styleableNavLink';
-import {StyleableButton} from '../general/StyleableButton';
+import {StyleableButton} from '../general/styleableButton';
 
 import rootStyles from '../../../styles/navigation/root';
 import fileListStyles from '../../../styles/processing/fileList';
@@ -48,10 +48,10 @@ export class Root extends React.Component {
                 sushi: true,
                 autoSushiArgs: true,
                 mux: true,
-                autoSushiAudio:
-                    '{"languages": ["jpn", "japan", "jap"], "names": []}',
-                autoSushiSubtitles:
-                    '{"languages": ["eng", "english"], "names": ["dialogue", "full"]}',
+                autoSushiAudioLanguages: 'ja,jp',
+                autoSushiAudioNames: '',
+                autoSushiSubtitlesLanguages: 'en',
+                autoSushiSubtitlesNames: 'dialog,full',
                 sushiArgs: '',
                 audioLanguages: '',
             },
@@ -118,7 +118,19 @@ export class Root extends React.Component {
     };
 
     initState = (state) => {
-        this.setState(state);
+        const newState = this.state;
+        for (const setting in newState.settings) {
+            if (state.settings.hasOwnProperty(setting)) {
+                newState.settings[setting] = state.settings[setting];
+            }
+        }
+        for (const executable in newState.executables) {
+            if (state.executables.hasOwnProperty(executable)) {
+                newState.executables[executable] =
+                    state.executables[executable];
+            }
+        }
+        this.setState(newState);
     };
 
     changeExecutablePath = (newPath, executable) => {
@@ -141,6 +153,29 @@ export class Root extends React.Component {
                 const sourcePaths = [...this.state.sourcePaths].reverse();
                 const targetPaths = [...this.state.targetPaths].reverse();
 
+                const settings = {};
+                for (const setting in this.state.settings) {
+                    if (
+                        setting !== 'autoSushiAudioLanguages' &&
+                        setting !== 'autoSushiAudioNames' &&
+                        setting !== 'autoSushiSubtitlesLanguages' &&
+                        setting !== 'autoSushiSubtitlesNames'
+                    ) {
+                        settings[setting] = this.state.settings[setting];
+                    }
+                }
+
+                const autoSushiAudio = {
+                    languages: this.state.settings.autoSushiAudioLanguages,
+                    names: this.state.settings.autoSushiAudioNames,
+                };
+                const autoSushiSubtitles = {
+                    languages: this.state.settings.autoSushiSubtitlesLanguages,
+                    names: this.state.settings.autoSushiSubtitlesNames,
+                };
+                settings.autoSushiAudio = autoSushiAudio;
+                settings.autoSushiSubtitles = autoSushiSubtitles;
+
                 const iterate = () => {
                     if (targetPaths.length > 0 && this.state.processing) {
                         let source = sourcePaths.pop();
@@ -148,7 +183,7 @@ export class Root extends React.Component {
                         window.ipcRenderer.send('process-mkv', {
                             source: source,
                             target: target,
-                            settings: this.state.settings,
+                            settings: settings,
                             sushi: this.state.executables.sushiPath,
                             mkvmerge: this.state.executables.mkvmergePath,
                         });
@@ -173,9 +208,7 @@ export class Root extends React.Component {
         this.setState({processing: false});
     };
 
-    handleStopProcess = () => {
-
-    }
+    handleStopProcess = () => {};
 
     log = (data) => {
         const newLog = this.state.log + data;

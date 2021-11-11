@@ -18,7 +18,7 @@ class MkvProcess {
         if (this.childProcess) {
             this.childProcess.kill();
         }
-    }
+    };
 
     sushiShift = async (
         extra_args = [],
@@ -28,7 +28,10 @@ class MkvProcess {
     ) => {
         this.abort = false;
 
-        let argumentList = [];
+        const executableParts = sushiExecutable.trim().split(' ');
+
+        let argumentList =
+            executableParts.length > 1 ? executableParts.slice(1) : [];
         argumentList.push('--src');
         argumentList.push(this.source);
         argumentList.push('--dst');
@@ -74,7 +77,8 @@ class MkvProcess {
         let outputName = path.join(
             path.dirname(this.target),
             'output',
-            path.basename(this.target, path.extname(this.target)) + path.extname(this.target),
+            path.basename(this.target, path.extname(this.target)) +
+                path.extname(this.target),
         );
 
         let sourceAudioId;
@@ -94,20 +98,27 @@ class MkvProcess {
             );
 
             if (settings.sushi && settings.autoSushiArgs) {
-                const audioParams = JSON.parse(settings.autoSushiAudio);
-                const subtitlesParams = JSON.parse(settings.autoSushiSubtitles);
+                const audioParams = settings.autoSushiAudio;
+                const subtitlesParams = settings.autoSushiSubtitles;
+
+                const audioLanguages = stringToList(audioParams.languages);
+                const audioNames = stringToList(audioParams.names);
+                const subtitlesLanguages = stringToList(
+                    subtitlesParams.languages,
+                );
+                const subtitlesNames = stringToList(subtitlesParams.names);
 
                 sourceAudioId = Math.min(
                     ...listIds(sourceMkvInfo.tracks, (item) => {
                         return (
                             item.type === 'audio' &&
-                            audioParams.languages.some((lang) =>
+                            audioLanguages.some((lang) =>
                                 item.properties.language
                                     .toLowerCase()
                                     .includes(lang.toLowerCase()),
                             ) &&
-                            (audioParams.names.length > 0
-                                ? audioParams.names.some((name) =>
+                            (audioNames.length > 0 && item.properties.track_name
+                                ? audioNames.some((name) =>
                                       item.properties.track_name
                                           .toLowerCase()
                                           .includes(name.toLowerCase()),
@@ -123,21 +134,18 @@ class MkvProcess {
                     ...listIds(sourceMkvInfo.tracks, (item) => {
                         return (
                             item.type === 'subtitles' &&
-                            subtitlesParams.languages.some((lang) =>
+                            subtitlesLanguages.some((lang) =>
                                 item.properties.language
                                     .toLowerCase()
                                     .includes(lang.toLowerCase()),
                             ) &&
-                            (subtitlesParams.names.length > 0
-                                ? subtitlesParams.names.some((name) => {
-                                      if (item.properties.track_name) {
-                                          return item.properties.track_name
-                                              .toLowerCase()
-                                              .includes(name.toLowerCase());
-                                      } else {
-                                          return false;
-                                      }
-                                  })
+                            (subtitlesNames.length > 0 &&
+                            item.properties.track_name
+                                ? subtitlesNames.some((name) =>
+                                      item.properties.track_name
+                                          .toLowerCase()
+                                          .includes(name.toLowerCase()),
+                                  )
                                 : true)
                         );
                     }),
@@ -150,13 +158,13 @@ class MkvProcess {
                     ...listIds(targetMkvInfo.tracks, (item) => {
                         return (
                             item.type === 'audio' &&
-                            audioParams.languages.some((lang) =>
+                            audioLanguages.some((lang) =>
                                 item.properties.language
                                     .toLowerCase()
                                     .includes(lang.toLowerCase()),
                             ) &&
-                            (audioParams.names.length > 0
-                                ? audioParams.names.some((name) =>
+                            (audioNames.length > 0 && item.properties.track_name
+                                ? audioNames.some((name) =>
                                       item.properties.track_name
                                           .toLowerCase()
                                           .includes(name.toLowerCase()),
@@ -233,7 +241,10 @@ class MkvProcess {
                             fontArguments.push(this.source);
                         }
                     } else {
-                        let attachmentsPath = path.join(this.source, 'attachments');
+                        let attachmentsPath = path.join(
+                            this.source,
+                            'attachments',
+                        );
                         let fonts = await fs.promises.readdir(attachmentsPath);
                         fonts = fonts.filter(
                             (file) =>
@@ -312,7 +323,7 @@ class MkvProcess {
                 }
             }
         } catch (error) {
-            console.log(error);
+            console.error(error);
         }
 
         console.log('argument list', argumentList);
@@ -338,7 +349,11 @@ class MkvProcess {
             sushiArgs = settings.sushiArgs.split(' ');
         }
 
-        if (fs.lstatSync(this.source).isFile() && settings.sushi && !this.abort) {
+        if (
+            fs.lstatSync(this.source).isFile() &&
+            settings.sushi &&
+            !this.abort
+        ) {
             this.sushiShift(
                 sushiArgs,
                 dataCallback,
@@ -361,7 +376,11 @@ class MkvProcess {
                 },
                 sushiExecutable,
             );
-        } else if (fs.lstatSync(this.source).isFile() && argumentList.length > 0 && !this.abort) {
+        } else if (
+            fs.lstatSync(this.source).isFile() &&
+            argumentList.length > 0 &&
+            !this.abort
+        ) {
             this.execMkvMerge(
                 outputName,
                 argumentList,
@@ -400,7 +419,7 @@ async function retrieveMkvInfo(
             out = JSON.parse(stdout);
         }
     } catch (error) {
-        console.log(error);
+        console.error(error);
     }
 
     return out;
@@ -422,6 +441,10 @@ async function listFiles(directory, filter = () => true, pathExtension = '') {
     return files;
 }
 
+function stringToList(list, separator = ',') {
+    return list.split(separator).map((item) => item.trim());
+}
+
 module.exports = {
-    MkvProcess
+    MkvProcess,
 };

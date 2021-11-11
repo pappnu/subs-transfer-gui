@@ -1,6 +1,6 @@
 import React from 'react';
 
-import {StyleableButton} from './StyleableButton';
+import {StyleableButton} from './styleableButton';
 
 export class FileList extends React.Component {
     render() {

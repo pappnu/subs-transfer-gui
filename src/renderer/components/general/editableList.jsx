@@ -2,7 +2,7 @@ import React from 'react';
 
 import {DropField} from './dropField';
 import {FileList} from './fileList';
-import {StyleableButton} from './StyleableButton';
+import {StyleableButton} from './styleableButton';
 
 export class EditableList extends React.Component {
     render() {

@@ -1,5 +1,5 @@
 import React from 'react';
-import {StyleableButton} from './StyleableButton';
+import {StyleableButton} from './styleableButton';
 
 export class TextAreaWithButton extends React.Component {
     render() {

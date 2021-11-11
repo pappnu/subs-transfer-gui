@@ -3,7 +3,7 @@ import React from 'react';
 import {EditableList} from '../general/editableList';
 import {SettingCheckbox} from '../general/settingCheckbox';
 import {SettingTextArea} from '../general/settingTextArea';
-import {StyleableButton} from '../general/StyleableButton';
+import {StyleableButton} from '../general/styleableButton';
 import {AutoScrollingTextArea} from '../general/autoScrollingTextArea';
 
 export class Processing extends React.Component {
@@ -40,12 +40,20 @@ export class Processing extends React.Component {
 
         const textAreaSettings = [
             {
-                id: 'autoSushiAudio',
-                text: 'Audio languages and names to seek when looking for audio for sushi:',
+                id: 'autoSushiAudioLanguages',
+                text: 'Audio languages to seek for sushi:',
             },
             {
-                id: 'autoSushiSubtitles',
-                text: 'Subtitle languages and names to seek when looking for subtitles for sushi:',
+                id: 'autoSushiAudioNames',
+                text: 'Audio names to seek for sushi:',
+            },
+            {
+                id: 'autoSushiSubtitlesLanguages',
+                text: 'Subtitle languages to seek for sushi:',
+            },
+            {
+                id: 'autoSushiSubtitlesNames',
+                text: 'Subtitle names to seek for sushi:',
             },
             {id: 'sushiArgs', text: 'Sushi extra arguments:'},
             {id: 'audioLanguages', text: 'Target audio languages to not mux:'},
