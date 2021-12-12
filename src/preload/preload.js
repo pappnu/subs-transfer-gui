@@ -50,11 +50,10 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
             ipcRenderer.on(channel, (event, ...args) => func(...args));
         }
     },
-    removeListener: (channel, func) => {
+    removeAllListeners: (channel) => {
         let validChannels = ['process-mkv'];
         if (validChannels.includes(channel)) {
-            // Deliberately strip event as it includes `sender`
-            ipcRenderer.removeListener(channel, func);
+            ipcRenderer.removeAllListeners(channel);
         }
     },
 });

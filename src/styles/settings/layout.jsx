@@ -3,7 +3,7 @@ export default {
         display: 'flex',
         flexDirection: 'column',
         flex: 1,
-        backgroundColor: '#121212',
+        backgroundColor: '#1c1c1c',
         overflow: 'auto',
     },
     textSettingContainer: {
@@ -18,5 +18,6 @@ export default {
         display: 'flex',
         flexDirection: 'row',
         justifyContent: 'space-between',
+        alignItems: 'center',
     }
 }

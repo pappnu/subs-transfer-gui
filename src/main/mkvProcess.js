@@ -11,7 +11,7 @@ class MkvProcess {
         this.target = target;
 
         this.abort = false;
-    }
+    };
 
     abortProcess = () => {
         this.abort = true;
@@ -220,6 +220,7 @@ class MkvProcess {
                                     'application/vnd.ms-opentype',
                                     'application/x-font-ttf',
                                     'application/x-font-opentype',
+                                    'font/sfnt',
                                 ].find((font) => item.content_type === font);
                             },
                         );

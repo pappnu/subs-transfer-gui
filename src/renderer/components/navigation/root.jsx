@@ -178,8 +178,8 @@ export class Root extends React.Component {
 
                 const iterate = () => {
                     if (targetPaths.length > 0 && this.state.processing) {
-                        let source = sourcePaths.pop();
-                        let target = targetPaths.pop();
+                        const source = sourcePaths.pop();
+                        const target = targetPaths.pop();
                         window.ipcRenderer.send('process-mkv', {
                             source: source,
                             target: target,
@@ -188,10 +188,7 @@ export class Root extends React.Component {
                             mkvmerge: this.state.executables.mkvmergePath,
                         });
                     } else {
-                        window.ipcRenderer.removeListener(
-                            'process-mkv',
-                            iterate,
-                        );
+                        window.ipcRenderer.removeAllListeners('process-mkv');
                         this.setState({processing: false});
                     }
                 };
