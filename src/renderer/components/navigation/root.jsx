@@ -1,5 +1,5 @@
 import React from 'react';
-import {MemoryRouter, Route, Switch} from 'react-router-dom';
+import {MemoryRouter, Route, Routes} from 'react-router-dom';
 
 import {Processing} from '../processing/processing';
 import {Settings} from '../settings/settings';
@@ -308,13 +308,13 @@ export class Root extends React.Component {
                             <StyleableNavLink
                                 style={this.state.styles.root.link}
                                 activeStyle={this.state.styles.root.activeLink}
-                                navLinkProps={{exact: true, to: '/'}}
+                                navLinkProps={{end: true, to: '/'}}
                                 text={'Home'}
                             />
                             <StyleableNavLink
                                 style={this.state.styles.root.link}
                                 activeStyle={this.state.styles.root.activeLink}
-                                navLinkProps={{exact: true, to: '/settings'}}
+                                navLinkProps={{end: true, to: '/settings'}}
                                 text={'Settings'}
                             />
                         </div>
@@ -343,38 +343,48 @@ export class Root extends React.Component {
                             />
                         </div>
                     </div>
-                    <Switch>
-                        <Route path="/settings">
-                            <Settings
-                                style={this.state.styles.settings}
-                                onTextAreaChange={this.changeExecutablePath}
-                                textAreaValues={this.state.executables}
-                                pickExecutablePath={this.pickExecutablePath}
-                            />
-                        </Route>
-                        <Route path="/">
-                            <Processing
-                                style={this.state.styles.processing}
-                                startProcessing={this.startProcessing}
-                                stopProcessing={this.stopProcessing}
-                                handleSourceDrop={this.handleSourceDrop}
-                                handleTargetDrop={this.handleTargetDrop}
-                                addSources={this.addSources}
-                                addTargets={this.addTargets}
-                                removeSource={this.removeSource}
-                                removeTarget={this.removeTarget}
-                                removeAllSources={this.removeAllSources}
-                                removeAllTargets={this.removeAllTargets}
-                                changeBooleanSetting={this.changeBooleanSetting}
-                                changeStringSetting={this.changeStringSetting}
-                                sourcePaths={this.state.sourcePaths}
-                                targetPaths={this.state.targetPaths}
-                                settings={this.state.settings}
-                                processing={this.state.processing}
-                                log={this.state.log}
-                            />
-                        </Route>
-                    </Switch>
+                    <Routes>
+                        <Route
+                            path="/settings"
+                            element={
+                                <Settings
+                                    style={this.state.styles.settings}
+                                    onTextAreaChange={this.changeExecutablePath}
+                                    textAreaValues={this.state.executables}
+                                    pickExecutablePath={this.pickExecutablePath}
+                                />
+                            }
+                        />
+                        <Route
+                            path="/"
+                            element={
+                                <Processing
+                                    style={this.state.styles.processing}
+                                    startProcessing={this.startProcessing}
+                                    stopProcessing={this.stopProcessing}
+                                    handleSourceDrop={this.handleSourceDrop}
+                                    handleTargetDrop={this.handleTargetDrop}
+                                    addSources={this.addSources}
+                                    addTargets={this.addTargets}
+                                    removeSource={this.removeSource}
+                                    removeTarget={this.removeTarget}
+                                    removeAllSources={this.removeAllSources}
+                                    removeAllTargets={this.removeAllTargets}
+                                    changeBooleanSetting={
+                                        this.changeBooleanSetting
+                                    }
+                                    changeStringSetting={
+                                        this.changeStringSetting
+                                    }
+                                    sourcePaths={this.state.sourcePaths}
+                                    targetPaths={this.state.targetPaths}
+                                    settings={this.state.settings}
+                                    processing={this.state.processing}
+                                    log={this.state.log}
+                                />
+                            }
+                        />
+                    </Routes>
                 </MemoryRouter>
             </div>
         );

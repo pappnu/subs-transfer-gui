@@ -180,33 +180,33 @@ class MkvProcess {
 
             if (settings.mux) {
                 // TODO: Copy and rename subtitles from source directories
-                if (
-                    'subDirCopy' in settings &&
-                    fs.lstatSync(this.source).isDirectory()
-                ) {
-                    let subs = await fs.promises.readdir(this.source);
-                    subs = subs.filter(
-                        (file) =>
-                            path.extname(file) === '.ass' ||
-                            path.extname(file) === '.srt',
-                    );
-                    subs = subs.map((file) => path.join(attachmentsPath, file));
-
-                    for (let i = 0; i < subs.length; i++) {
-                        let dest = path.join(
-                            workDirectory,
-                            path
-                                .basename(subs[i])
-                                .substr(
-                                    0,
-                                    path.basename(subs[i]).lastIndexOf('.') + 1,
-                                ) +
-                                i +
-                                '.ass',
-                        );
-                        fs.copyFile(subs[i], dest);
-                    }
-                }
+                //if (
+                //    'subDirCopy' in settings &&
+                //    fs.lstatSync(this.source).isDirectory()
+                //) {
+                //    let subs = await fs.promises.readdir(this.source);
+                //    subs = subs.filter(
+                //        (file) =>
+                //            path.extname(file) === '.ass' ||
+                //            path.extname(file) === '.srt',
+                //    );
+                //    subs = subs.map((file) => path.join(attachmentsPath, file));
+                //
+                //    for (let i = 0; i < subs.length; i++) {
+                //        let dest = path.join(
+                //            workDirectory,
+                //            path
+                //                .basename(subs[i])
+                //                .substr(
+                //                    0,
+                //                    path.basename(subs[i]).lastIndexOf('.') + 1,
+                //                ) +
+                //                i +
+                //                '.ass',
+                //        );
+                //        fs.copyFile(subs[i], dest);
+                //    }
+                //}
 
                 // Copy fonts from subtitle source mkv or folder
                 let fontArguments = [];
@@ -221,6 +221,7 @@ class MkvProcess {
                                     'application/x-font-ttf',
                                     'application/x-font-opentype',
                                     'font/sfnt',
+                                    'font/ttf',
                                 ].find((font) => item.content_type === font);
                             },
                         );
@@ -410,7 +411,8 @@ async function retrieveMkvInfo(
 
     let out;
     try {
-        const {stdout, stderr} = await promisifiedExecFile(
+        // stderr also available
+        const {stdout} = await promisifiedExecFile(
             mkvMergeExecutable,
             ['--identify', mkv, '--identification-format', format],
             {maxBuffer: 5242880},
@@ -434,13 +436,13 @@ function listIds(list, filter) {
     });
 }
 
-async function listFiles(directory, filter = () => true, pathExtension = '') {
-    let files = await fs.promises.readdir(path.normalize(directory));
-    files = files.map((file) => path.join(directory, file, pathExtension));
-    files = files.filter(filter);
-    files.sort(naturalSort);
-    return files;
-}
+// async function listFiles(directory, filter = () => true, pathExtension = '') {
+//     let files = await fs.promises.readdir(path.normalize(directory));
+//     files = files.map((file) => path.join(directory, file, pathExtension));
+//     files = files.filter(filter);
+//     files.sort(naturalSort);
+//     return files;
+// }
 
 function stringToList(list, separator = ',') {
     return list.split(separator).map((item) => item.trim());

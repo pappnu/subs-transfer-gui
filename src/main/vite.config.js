@@ -1,7 +1,6 @@
 import path from 'path';
 
 import {defineConfig} from 'vite';
-import reactRefresh from '@vitejs/plugin-react-refresh';
 import {builtinModules} from 'module';
 
 // https://vitejs.dev/config/

@@ -47,8 +47,7 @@ export class StyleableNavLink extends React.Component {
         }
         return (
             <NavLink
-                style={style}
-                activeStyle={activeStyle}
+                style={({isActive}) => (isActive ? activeStyle : style)}
                 onMouseOver={this.onMouseOver}
                 onMouseLeave={this.onMouseLeave}
                 onMouseDown={this.onMouseDown}

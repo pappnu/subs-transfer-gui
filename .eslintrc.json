@@ -32,6 +32,13 @@
             {
                 "skipUndeclared": true
             }
+        ],
+        "no-unused-vars": [
+            "warn",
+            {
+                "vars": "all",
+                "args": "none"
+            }
         ]
     },
     "settings": {
