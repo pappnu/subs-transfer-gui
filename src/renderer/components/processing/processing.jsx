@@ -87,6 +87,9 @@ export class Processing extends React.Component {
                                 this.props.style.layout.fileButtonsContainer,
                             fileListContainer:
                                 this.props.style.layout.fileListContainer,
+                            fileListContainerDragOver:
+                                this.props.style.layout
+                                    .fileListContainerDragOver,
                             fileList: this.props.style.fileList,
                             instructionsContainer:
                                 this.props.style.layout.instructionsContainer,
@@ -97,7 +100,7 @@ export class Processing extends React.Component {
                         handleOnDrop={this.props.handleSourceDrop}
                         files={sourcePaths}
                         remove={this.props.removeSource}
-                        instructions={'Drop files or folders here'}
+                        instructions={'Drop files here'}
                     />
                     <EditableList
                         style={{
@@ -109,6 +112,9 @@ export class Processing extends React.Component {
                                 this.props.style.layout.fileButtonsContainer,
                             fileListContainer:
                                 this.props.style.layout.fileListContainer,
+                            fileListContainerDragOver:
+                                this.props.style.layout
+                                    .fileListContainerDragOver,
                             fileList: this.props.style.fileList,
                             instructionsContainer:
                                 this.props.style.layout.instructionsContainer,

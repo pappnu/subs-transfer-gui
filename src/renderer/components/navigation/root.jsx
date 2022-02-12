@@ -9,7 +9,7 @@ import {StyleableButton} from '../general/styleableButton';
 
 import rootStyles from '../../../styles/navigation/root';
 import fileListStyles from '../../../styles/processing/fileList';
-import processingSettingStyles from '../../../styles/processing/settings';
+import processingSettingsStyles from '../../../styles/processing/settings';
 import processingLayoutStyles from '../../../styles/processing/layout';
 import settingsStyles from '../../../styles/settings/settings';
 import settingsLayoutStyles from '../../../styles/settings/layout';
@@ -22,7 +22,7 @@ export class Root extends React.Component {
             root: rootStyles,
             processing: {
                 fileList: fileListStyles,
-                settings: processingSettingStyles,
+                settings: processingSettingsStyles,
                 layout: processingLayoutStyles,
             },
             settings: {

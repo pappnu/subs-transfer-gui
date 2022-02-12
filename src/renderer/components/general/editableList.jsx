@@ -26,8 +26,9 @@ export class EditableList extends React.Component {
                     </div>
                 </div>
                 <DropField
-                    handleOnDrop={this.props.handleOnDrop}
-                    style={this.props.style.fileListContainer}>
+                    onDrop={this.props.handleOnDrop}
+                    style={this.props.style.fileListContainer}
+                    styleOnDragOver={this.props.style.fileListContainerDragOver}>
                     {this.props.files.length > 0 ? (
                         <FileList
                             style={{

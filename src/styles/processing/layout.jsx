@@ -1,3 +1,14 @@
+const fileListContainer = {
+    display: 'flex',
+    flexGrow: 1,
+    marginRight: '4px',
+    marginLeft: '4px',
+    marginBottom: '4px',
+    backgroundColor: 'rgba(255,255,255,0.05)',
+    border: 'solid',
+    minHeight: '100px',
+};
+
 export default {
     processingContainer: {
         display: 'flex',
@@ -16,16 +27,14 @@ export default {
         flexDirection: 'row',
     },
     fileListContainer: {
-        display: 'flex',
-        flexGrow: 1,
-        marginRight: '4px',
-        marginLeft: '4px',
-        marginBottom: '4px',
-        backgroundColor: 'rgba(255,255,255,0.05)',
-        border: 'solid',
+        ...fileListContainer,
         borderColor: 'rgba(255,255,255,0.2)',
         borderWidth: '1px',
-        minHeight: '100px',
+    },
+    fileListContainerDragOver: {
+        ...fileListContainer,
+        borderColor: 'rgba(64, 162, 247, 1)',
+        borderWidth: '1px',
     },
     editableListContainer: {
         display: 'flex',

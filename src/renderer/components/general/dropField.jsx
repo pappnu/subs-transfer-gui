@@ -1,23 +1,31 @@
-import React from 'react';
+import React, { useState } from 'react';
 
-export class DropField extends React.Component {
-    handleOnDrop = (event) => {
+export function DropField({style, styleOnDragOver, onDrop, children}) {
+    const [activeStyle, setActiveStyle] = useState(style);
+
+    const handleOnDrop = (event) => {
         event.preventDefault();
-        this.props.handleOnDrop(event);
+        setActiveStyle(style);
+        onDrop(event);
     };
 
-    handleOnDragOver = (event) => {
+    const handleOnDragOver = (event) => {
         event.preventDefault();
+        setActiveStyle(styleOnDragOver);
     };
 
-    render() {
-        return (
-            <div
-                onDragOver={this.handleOnDragOver}
-                onDrop={this.handleOnDrop}
-                style={this.props.style}>
-                {this.props.children}
-            </div>
-        );
-    }
+    const handleOnDragLeave = (event) => {
+        event.preventDefault();
+        setActiveStyle(style);
+    };
+
+    return (
+        <div
+            onDragOver={handleOnDragOver}
+            onDragLeave={handleOnDragLeave}
+            onDrop={handleOnDrop}
+            style={activeStyle}>
+            {children}
+        </div>
+    );
 }
