@@ -1,9 +1,9 @@
 import React from 'react';
 import {MemoryRouter, Route, Routes} from 'react-router-dom';
+import {arrayMove} from '@dnd-kit/sortable';
 
 import {Processing} from '../processing/processing';
 import {Settings} from '../settings/settings';
-import {naturalSort} from '../utility/sorting';
 import {StyleableNavLink} from '../general/styleableNavLink';
 import {StyleableButton} from '../general/styleableButton';
 
@@ -13,6 +13,8 @@ import processingSettingsStyles from '../../../styles/processing/settings';
 import processingLayoutStyles from '../../../styles/processing/layout';
 import settingsStyles from '../../../styles/settings/settings';
 import settingsLayoutStyles from '../../../styles/settings/layout';
+
+let nextPathId = 1;
 
 export class Root extends React.Component {
     constructor(props) {
@@ -150,8 +152,12 @@ export class Root extends React.Component {
     startProcessing = () => {
         if (this.state.targetPaths.length > 0) {
             this.setState({processing: true}, () => {
-                const sourcePaths = [...this.state.sourcePaths].reverse();
-                const targetPaths = [...this.state.targetPaths].reverse();
+                const sourcePaths = this.state.sourcePaths
+                    .map((item) => item.path)
+                    .reverse();
+                const targetPaths = this.state.targetPaths
+                    .map((item) => item.path)
+                    .reverse();
 
                 const settings = {};
                 for (const setting in this.state.settings) {
@@ -205,8 +211,6 @@ export class Root extends React.Component {
         this.setState({processing: false});
     };
 
-    handleStopProcess = () => {};
-
     log = (data) => {
         const newLog = this.state.log + data;
         this.setState({log: newLog});
@@ -215,13 +219,16 @@ export class Root extends React.Component {
     handleFileDrop = (event, listName, sorting = undefined) => {
         const newState = {};
         newState[listName] = this.state[listName].concat(
-            Array.from(event.dataTransfer.files).map((item) => item.path),
+            Array.from(event.dataTransfer.files).map((item) => ({
+                id: nextPathId++,
+                path: item.path,
+            })),
         );
         if (sorting) {
             newState[listName] = newState[listName].sort((a, b) =>
                 sorting(
-                    window.nodeModules.path.basename(a),
-                    window.nodeModules.path.basename(b),
+                    window.nodeModules.path.basename(a.path),
+                    window.nodeModules.path.basename(b.path),
                 ),
             );
         }
@@ -229,21 +236,23 @@ export class Root extends React.Component {
     };
 
     handleSourceDrop = (event) => {
-        this.handleFileDrop(event, 'sourcePaths', naturalSort);
+        this.handleFileDrop(event, 'sourcePaths');
     };
 
     handleTargetDrop = (event) => {
-        this.handleFileDrop(event, 'targetPaths', naturalSort);
+        this.handleFileDrop(event, 'targetPaths');
     };
 
     addFiles = (paths, listName, sorting = undefined) => {
         const newState = {};
-        newState[listName] = this.state[listName].concat(paths);
+        newState[listName] = this.state[listName].concat(
+            paths.map((item) => ({id: nextPathId++, path: item})),
+        );
         if (sorting) {
             newState[listName] = newState[listName].sort((a, b) =>
                 sorting(
-                    window.nodeModules.path.basename(a),
-                    window.nodeModules.path.basename(b),
+                    window.nodeModules.path.basename(a.path),
+                    window.nodeModules.path.basename(b.path),
                 ),
             );
         }
@@ -252,12 +261,12 @@ export class Root extends React.Component {
 
     addSources = async () => {
         const result = await window.ipcRenderer.invoke('select-files');
-        this.addFiles(result.filePaths, 'sourcePaths', naturalSort);
+        this.addFiles(result.filePaths, 'sourcePaths');
     };
 
     addTargets = async () => {
         const result = await window.ipcRenderer.invoke('select-files');
-        this.addFiles(result.filePaths, 'targetPaths', naturalSort);
+        this.addFiles(result.filePaths, 'targetPaths');
     };
 
     removeFile = (index, listName) => {
@@ -281,6 +290,73 @@ export class Root extends React.Component {
 
     removeAllTargets = () => {
         this.setState({targetPaths: []});
+    };
+
+    findDragContainer = (id) => {
+        const containers = ['sourcePaths', 'targetPaths'];
+        if (containers.includes(id)) {
+            return id;
+        }
+        return containers.find((cont) =>
+            this.state[cont].find((item) => item.id === id),
+        );
+    };
+
+    movePathWithinList = (event) => {
+        const {active, over} = event;
+        const activeContainer = this.findDragContainer(active.id);
+        const overContainer = this.findDragContainer(over.id);
+        if (active.id !== over.id) {
+            const newState = {};
+            const moveToList = [...this.state[overContainer]];
+            const newIndex = moveToList.findIndex(
+                (item) => item.id === over.id,
+            );
+            if (activeContainer === overContainer) {
+                const oldIndex = moveToList.findIndex(
+                    (item) => item.id === active.id,
+                );
+                newState[overContainer] = arrayMove(
+                    moveToList,
+                    oldIndex,
+                    newIndex,
+                );
+            } else {
+                const currentList = [...this.state[activeContainer]];
+                const oldIndex = currentList.findIndex(
+                    (item) => item.id === active.id,
+                );
+                currentList.splice(oldIndex, 1);
+                moveToList.splice(newIndex, 0, active.id);
+                newState[activeContainer] = currentList;
+                newState[overContainer] = moveToList;
+            }
+            this.setState(newState);
+        }
+    };
+
+    moveToSourcesOrPaths = (event) => {
+        const {active, over} = event;
+        const activeContainer = this.findDragContainer(active.id);
+        const overContainer = this.findDragContainer(over.id);
+        if (
+            !activeContainer ||
+            !overContainer ||
+            activeContainer === overContainer
+        ) {
+            return;
+        }
+        const newState = {};
+        const moveToList = [...this.state[overContainer]];
+        const newIndex = moveToList.findIndex((item) => item.id === over.id);
+        const currentList = [...this.state[activeContainer]];
+        const oldIndex = currentList.findIndex((item) => item.id === active.id);
+        const itemToMove = currentList.splice(oldIndex, 1)[0];
+        moveToList.splice(newIndex, 0, itemToMove);
+        newState[activeContainer] = currentList;
+        newState[overContainer] = moveToList;
+        console.log(newState);
+        this.setState(newState);
     };
 
     changeBooleanSetting = (setting) => {
@@ -370,6 +446,8 @@ export class Root extends React.Component {
                                     removeTarget={this.removeTarget}
                                     removeAllSources={this.removeAllSources}
                                     removeAllTargets={this.removeAllTargets}
+                                    move={this.movePathWithinList}
+                                    moveOver={this.moveToSourcesOrPaths}
                                     changeBooleanSetting={
                                         this.changeBooleanSetting
                                     }

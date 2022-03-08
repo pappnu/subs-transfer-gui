@@ -4,48 +4,53 @@ import {DropField} from './dropField';
 import {FileList} from './fileList';
 import {StyleableButton} from './styleableButton';
 
-export class EditableList extends React.Component {
-    render() {
-        return (
-            <div style={this.props.style.editableListContainer}>
-                <div style={this.props.style.headerContainer}>
-                    <div style={this.props.style.fileList.header}>
-                        {this.props.header}
-                    </div>
-                    <div style={this.props.style.fileButtonsContainer}>
-                        <StyleableButton
-                            style={this.props.style.fileList.fileButton}
-                            onClick={this.props.addFiles}
-                            text={'Add files'}
-                        />
-                        <StyleableButton
-                            style={this.props.style.fileList.fileButton}
-                            onClick={this.props.removeAll}
-                            text={'Remove all'}
-                        />
-                    </div>
+export function EditableList({
+    style,
+    header,
+    addFiles,
+    removeAll,
+    handleOnDrop,
+    files,
+    remove,
+    instructions,
+}) {
+    return (
+        <div style={style.editableListContainer}>
+            <div style={style.headerContainer}>
+                <div style={style.fileList.header}>{header}</div>
+                <div style={style.fileButtonsContainer}>
+                    <StyleableButton
+                        style={style.fileList.fileButton}
+                        onClick={addFiles}
+                        text={'Add files'}
+                    />
+                    <StyleableButton
+                        style={style.fileList.fileButton}
+                        onClick={removeAll}
+                        text={'Remove all'}
+                    />
                 </div>
-                <DropField
-                    onDrop={this.props.handleOnDrop}
-                    style={this.props.style.fileListContainer}
-                    styleOnDragOver={this.props.style.fileListContainerDragOver}>
-                    {this.props.files.length > 0 ? (
-                        <FileList
-                            style={{
-                                listItem: this.props.style.fileList.listItem,
-                                list: this.props.style.fileList.list,
-                                button: this.props.style.fileList.listButton,
-                            }}
-                            files={this.props.files}
-                            remove={this.props.remove}
-                        />
-                    ) : (
-                        <div style={this.props.style.instructionsContainer}>
-                            {this.props.instructions}
-                        </div>
-                    )}
-                </DropField>
             </div>
-        );
-    }
+            <DropField
+                onDrop={handleOnDrop}
+                style={style.fileListContainer}
+                styleOnDragOver={style.fileListContainerDragOver}>
+                {files.length > 0 ? (
+                    <FileList
+                        style={{
+                            listItem: style.fileList.listItem,
+                            list: style.fileList.list,
+                            button: style.fileList.listButton,
+                        }}
+                        files={files}
+                        remove={remove}
+                    />
+                ) : (
+                    <div style={style.instructionsContainer}>
+                        {instructions}
+                    </div>
+                )}
+            </DropField>
+        </div>
+    );
 }

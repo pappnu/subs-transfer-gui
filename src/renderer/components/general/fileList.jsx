@@ -1,21 +1,24 @@
 import React from 'react';
+import {DraggableListItem} from './draggableListItem';
 
-import {StyleableButton} from './styleableButton';
-
-export class FileList extends React.Component {
-    render() {
-        const listItems = this.props.files.map((item, index) => (
-            <li style={this.props.style.listItem} key={index.toString()}>
-                {item}
-                <StyleableButton
-                    style={{...this.props.style.button}}
-                    onClick={() => {
-                        this.props.remove(index);
-                    }}
-                    text={'✕'}
-                />
-            </li>
-        ));
-        return <ul style={this.props.style.list}>{listItems}</ul>;
-    }
+export function FileList({style, files, remove}) {
+    const listItems = files.map((item, index) => (
+        <DraggableListItem
+            key={item.id}
+            style={{
+                container: style.listItem,
+                button: style.button,
+            }}
+            id={item.id}
+            index={index}
+            item={
+                <>
+                    <div>{index + 1}.</div>
+                    <div>{window.nodeModules.path.basename(item.path)}</div>
+                </>
+            }
+            remove={remove}
+        />
+    ));
+    return <ul style={style.list}>{listItems}</ul>;
 }
