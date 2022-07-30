@@ -103,7 +103,7 @@ ipcMain.handle(
 
 ipcMain.on('process-mkv', async (event, arg) => {
     const log = (data) => {
-        event.reply('log', data.toString());
+        event.reply('log', data);
     };
     const end = () => {
         activeProcess = undefined;

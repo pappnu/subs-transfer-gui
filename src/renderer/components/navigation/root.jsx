@@ -38,7 +38,7 @@ export class Root extends React.Component {
             maximized: false,
             sourcePaths: [],
             targetPaths: [],
-            log: '',
+            log: [],
             processing: false,
             executables: {
                 sushiPath: 'sushi',
@@ -151,7 +151,7 @@ export class Root extends React.Component {
 
     startProcessing = () => {
         if (this.state.targetPaths.length > 0) {
-            this.setState({processing: true}, () => {
+            this.setState({processing: true, log: []}, () => {
                 const sourcePaths = this.state.sourcePaths
                     .map((item) => item.path)
                     .reverse();
@@ -195,7 +195,21 @@ export class Root extends React.Component {
                         });
                     } else {
                         window.ipcRenderer.removeAllListeners('process-mkv');
-                        this.setState({processing: false});
+                        const errorsEncountered = this.state.log.find(
+                            (item) => item.type === 'error',
+                        );
+                        this.setState({
+                            processing: false,
+                            log: [
+                                ...this.state.log,
+                                errorsEncountered
+                                    ? {
+                                          type: 'error',
+                                          value: 'Finished with error(s)',
+                                      }
+                                    : {type: 'log', value: 'Finished'},
+                            ],
+                        });
                     }
                 };
 
@@ -212,8 +226,10 @@ export class Root extends React.Component {
     };
 
     log = (data) => {
-        const newLog = this.state.log + data;
-        this.setState({log: newLog});
+        if (data) {
+            const newLog = [...this.state.log, data];
+            this.setState({log: newLog});
+        }
     };
 
     handleFileDrop = (event, listName, sorting = undefined) => {

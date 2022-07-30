@@ -11,7 +11,7 @@ class MkvProcess {
         this.target = target;
 
         this.abort = false;
-    };
+    }
 
     abortProcess = () => {
         this.abort = true;
@@ -39,8 +39,12 @@ class MkvProcess {
         argumentList = argumentList.concat(extra_args);
 
         this.childProcess = spawn(sushiExecutable, argumentList);
-        this.childProcess.stdout.on('data', onData);
-        this.childProcess.stderr.on('data', onData);
+        this.childProcess.stdout.on('data', (data) =>
+            onData({type: 'error', value: data.toString()}),
+        );
+        this.childProcess.stderr.on('data', (data) =>
+            onData({type: 'log', value: data.toString()}),
+        );
         this.childProcess.on('close', onClose);
     };
 
@@ -59,8 +63,12 @@ class MkvProcess {
         args = args.concat(argumentList);
 
         this.childProcess = spawn(mkvMergeExecutable, args);
-        this.childProcess.stdout.on('data', onData);
-        this.childProcess.stderr.on('data', onData);
+        this.childProcess.stdout.on('data', (data) =>
+            onData({type: 'log', value: data.toString()}),
+        );
+        this.childProcess.stderr.on('data', (data) =>
+            onData({type: 'error', value: data.toString()}),
+        );
         this.childProcess.on('close', onClose);
     };
 
@@ -360,14 +368,24 @@ class MkvProcess {
                 sushiArgs,
                 dataCallback,
                 (sushiCode) => {
-                    console.log('sushi exit code: ', sushiCode);
+                    if (sushiCode) {
+                        dataCallback({
+                            type: 'error',
+                            value: `Sushi errored with source "${this.source}" and target "${this.target}"`,
+                        });
+                    }
                     if (!sushiCode && argumentList.length > 0 && !this.abort) {
                         this.execMkvMerge(
                             outputName,
                             argumentList,
                             dataCallback,
                             (mergeCode) => {
-                                console.log('MKVMerge exit code: ', mergeCode);
+                                if (mergeCode) {
+                                    dataCallback({
+                                        type: 'error',
+                                        value: `MKV Merge errored with source "${this.source}" and target "${this.target}"`,
+                                    });
+                                }
                                 exitCallback(sushiCode, mergeCode);
                             },
                             mkvMergeExecutable,
@@ -388,7 +406,12 @@ class MkvProcess {
                 argumentList,
                 dataCallback,
                 (mergeCode) => {
-                    console.log('MKVMerge exit code: ', mergeCode);
+                    if (mergeCode) {
+                        dataCallback({
+                            type: 'error',
+                            value: `MKV Merge errored with source "${this.source}" and target "${this.target}"`,
+                        });
+                    }
                     exitCallback(undefined, mergeCode);
                 },
                 mkvMergeExecutable,

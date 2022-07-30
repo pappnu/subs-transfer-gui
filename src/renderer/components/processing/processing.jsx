@@ -1,4 +1,4 @@
-import React from 'react';
+import React, {useEffect, useRef} from 'react';
 import {
     DndContext,
     closestCenter,
@@ -13,7 +13,7 @@ import {EditableList} from '../general/editableList';
 import {SettingCheckbox} from '../general/settingCheckbox';
 import {SettingTextArea} from '../general/settingTextArea';
 import {StyleableButton} from '../general/styleableButton';
-import {AutoScrollingTextArea} from '../general/autoScrollingTextArea';
+import {Virtuoso} from 'react-virtuoso';
 
 const booleanSettings = [
     {id: 'sushi', text: 'Run Sushi:'},
@@ -53,6 +53,8 @@ export function Processing({
         },
     });
     const sensors = useSensors(mouseSensor);
+    const logRef = useRef(null);
+    const scrollerRef = useRef(null);
 
     const booleanSettingComponents = booleanSettings.map((item) => (
         <SettingCheckbox
@@ -105,6 +107,21 @@ export function Processing({
             }}
         />
     ));
+
+    useEffect(() => {
+        if (
+            logRef &&
+            scrollerRef &&
+            document.activeElement !== scrollerRef.current
+        ) {
+            logRef.current.scrollToIndex({
+                index: log.length - 1,
+                align: 'start',
+                behavior: 'auto',
+            });
+        }
+    }, [log, logRef, scrollerRef]);
+
     return (
         <div style={style.layout.processingContainer}>
             <div style={style.layout.fileInputsContainer}>
@@ -198,11 +215,24 @@ export function Processing({
                 />
             </div>
             <div style={style.layout.logContainer}>
-                <AutoScrollingTextArea
+                <Virtuoso
+                    ref={logRef}
+                    scrollerRef={(ref) => {
+                        scrollerRef.current = ref;
+                    }}
                     style={style.settings.log}
-                    disabled={false}
-                    readOnly={true}
-                    value={log}
+                    totalCount={log.length}
+                    itemContent={(index) => (
+                        <div
+                            style={{
+                                ...style.settings.logText,
+                                ...(log[index].type === 'error'
+                                    ? {color: 'rgba(190,0,0,1)'}
+                                    : {}),
+                            }}>
+                            {log[index].value}
+                        </div>
+                    )}
                 />
             </div>
         </div>

@@ -68,6 +68,10 @@ export default {
         flexDirection: 'column',
         flexGrow: 1,
         margin: '4px',
+        backgroundColor: 'rgba(255,255,255,0.1)',
+        borderColor: 'rgba(255,255,255,0.3)',
+        borderWidth: '1px',
+        borderStyle: 'solid',
     },
     textSettingContainer: {
         display: 'flex',

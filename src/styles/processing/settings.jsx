@@ -1,7 +1,7 @@
 export default {
     text: {
         borderColor: 'rgba(255,255,255,0.87)',
-        fontSize: '15px'
+        fontSize: '15px',
     },
     textarea: {
         backgroundColor: 'rgba(255,255,255,0.05)',
@@ -12,12 +12,15 @@ export default {
     },
     log: {
         flexGrow: 1,
-        backgroundColor: 'rgba(255,255,255,0.1)',
-        color: 'rgba(255,255,255,0.87)',
-        borderColor: 'rgba(255,255,255,0.3)',
-        marginTop: '4px',
+        overflow: 'auto',
         resize: 'vertical',
+        marginTop: '4px',
         minHeight: '200px',
+    },
+    logText: {
+        color: 'rgba(255,255,255,0.87)',
+        fontFamily: 'monospace',
+        fontSize: '13px',
     },
     startButton: {
         default: {
