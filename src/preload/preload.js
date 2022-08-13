@@ -51,7 +51,7 @@ contextBridge.exposeInMainWorld('ipcRenderer', {
         }
     },
     removeAllListeners: (channel) => {
-        let validChannels = ['process-mkv'];
+        let validChannels = ['log', 'is-window-maximized', 'process-mkv'];
         if (validChannels.includes(channel)) {
             ipcRenderer.removeAllListeners(channel);
         }

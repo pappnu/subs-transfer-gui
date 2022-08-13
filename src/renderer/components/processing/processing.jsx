@@ -12,7 +12,6 @@ import {SortableContext, verticalListSortingStrategy} from '@dnd-kit/sortable';
 import {EditableList} from '../general/editableList';
 import {SettingCheckbox} from '../general/settingCheckbox';
 import {SettingTextArea} from '../general/settingTextArea';
-import {StyleableButton} from '../general/styleableButton';
 import {Virtuoso} from 'react-virtuoso';
 
 const booleanSettings = [
@@ -40,9 +39,6 @@ export function Processing({
     removeTarget,
     move,
     moveOver,
-    processing,
-    startProcessing,
-    stopProcessing,
     log,
 }) {
     const {setNodeRef: sourceNodeRef} = useDroppable({id: 'sourceDroppable'});
@@ -201,18 +197,6 @@ export function Processing({
             </div>
             <div style={style.layout.textSettingsContainer}>
                 {textAreaSettingComponents}
-            </div>
-            <div style={style.layout.settingsContainer}>
-                <StyleableButton
-                    style={
-                        processing
-                            ? style.settings.stopButton
-                            : style.settings.startButton
-                    }
-                    onClick={processing ? stopProcessing : startProcessing}
-                    disabled={false}
-                    text={processing ? 'Stop' : 'Start'}
-                />
             </div>
             <div style={style.layout.logContainer}>
                 <Virtuoso

@@ -5,6 +5,20 @@ const path = require('path');
 const util = require('util');
 const promisifiedExecFile = util.promisify(execFile);
 
+const fontMIMETypes = [
+    'application/x-truetype-font',
+    'application/vnd.ms-opentype',
+    'application/vnd.ms-fontobject',
+    'application/x-font-ttf',
+    'application/x-font-truetype',
+    'application/x-font-opentype',
+    'font/sfnt',
+    'font/otf',
+    'font/ttf',
+    'font/woff',
+    'font/woff2',
+];
+
 class MkvProcess {
     constructor(source, target) {
         this.source = source;
@@ -85,8 +99,7 @@ class MkvProcess {
         let outputName = path.join(
             path.dirname(this.target),
             'output',
-            path.basename(this.target, path.extname(this.target)) +
-                path.extname(this.target),
+            path.basename(this.target),
         );
 
         let sourceAudioId;
@@ -223,14 +236,9 @@ class MkvProcess {
                         let sourceFontAttachmentIds = listIds(
                             sourceMkvInfo.attachments,
                             (item) => {
-                                return [
-                                    'application/x-truetype-font',
-                                    'application/vnd.ms-opentype',
-                                    'application/x-font-ttf',
-                                    'application/x-font-opentype',
-                                    'font/sfnt',
-                                    'font/ttf',
-                                ].find((font) => item.content_type === font);
+                                return fontMIMETypes.find(
+                                    (font) => item.content_type === font,
+                                );
                             },
                         );
 
@@ -314,9 +322,8 @@ class MkvProcess {
                         let inputFontAttachmentIds = listIds(
                             targetMkvInfo.attachments,
                             (item) => {
-                                return (
-                                    item.content_type ===
-                                    'application/x-truetype-font'
+                                return fontMIMETypes.find(
+                                    (font) => item.content_type === font,
                                 );
                             },
                         );
@@ -356,8 +363,22 @@ class MkvProcess {
             sushiArgs.push(targetAudioId);
         }
         if (settings.sushiArgs) {
-            sushiArgs = settings.sushiArgs.split(' ');
+            sushiArgs = sushiArgs.concat(settings.sushiArgs.split(' '));
         }
+        const sushiOutPath = path.join(
+            path.dirname(this.target),
+            'output',
+            path.basename(this.target) + '.sushi.ass',
+        );
+        // TODO create only directory
+        fs.closeSync(fs.openSync(sushiOutPath, 'w'));
+        sushiArgs.push(
+            `-o ${path.join(
+                path.dirname(this.target),
+                'output',
+                path.basename(this.target) + '.sushi.ass',
+            )}`,
+        );
 
         if (
             fs.lstatSync(this.source).isFile() &&

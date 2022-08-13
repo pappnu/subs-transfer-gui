@@ -1,5 +1,5 @@
 import React from 'react';
-import {MemoryRouter, Route, Routes} from 'react-router-dom';
+import {MemoryRouter, Route, Routes, useMatch} from 'react-router-dom';
 import {arrayMove} from '@dnd-kit/sortable';
 
 import {Processing} from '../processing/processing';
@@ -15,6 +15,11 @@ import settingsStyles from '../../../styles/settings/settings';
 import settingsLayoutStyles from '../../../styles/settings/layout';
 
 let nextPathId = 1;
+
+function StartButton(props) {
+    const match = useMatch('/');
+    return match ? <StyleableButton {...props} /> : null;
+}
 
 export class Root extends React.Component {
     constructor(props) {
@@ -81,11 +86,8 @@ export class Root extends React.Component {
     }
 
     componentWillUnmount() {
-        window.ipcRenderer.removeListener('log', this.log);
-        window.ipcRenderer.removeListener(
-            'is-window-maximized',
-            this.setMaximizedState,
-        );
+        window.ipcRenderer.removeAllListeners('log');
+        window.ipcRenderer.removeAllListeners('is-window-maximized');
     }
 
     setMaximizedState = (data) => {
@@ -411,6 +413,21 @@ export class Root extends React.Component {
                             />
                         </div>
                         <div style={this.state.styles.root.buttonContainer}>
+                            <StartButton
+                                style={
+                                    this.state.processing
+                                        ? this.state.styles.processing.settings
+                                              .stopButton
+                                        : this.state.styles.processing.settings
+                                              .startButton
+                                }
+                                onClick={
+                                    this.state.processing
+                                        ? this.stopProcessing
+                                        : this.startProcessing
+                                }
+                                text={this.state.processing ? '■ stop' : '▶   START'}
+                            />
                             <StyleableButton
                                 style={this.state.styles.root.menuButton}
                                 text={'–'}
@@ -452,8 +469,6 @@ export class Root extends React.Component {
                             element={
                                 <Processing
                                     style={this.state.styles.processing}
-                                    startProcessing={this.startProcessing}
-                                    stopProcessing={this.stopProcessing}
                                     handleSourceDrop={this.handleSourceDrop}
                                     handleTargetDrop={this.handleTargetDrop}
                                     addSources={this.addSources}
@@ -473,7 +488,6 @@ export class Root extends React.Component {
                                     sourcePaths={this.state.sourcePaths}
                                     targetPaths={this.state.targetPaths}
                                     settings={this.state.settings}
-                                    processing={this.state.processing}
                                     log={this.state.log}
                                 />
                             }

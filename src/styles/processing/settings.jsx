@@ -1,3 +1,13 @@
+const buttonShared = {
+    color: 'rgba(255,255,255,0.87)',
+    fontSize: '14px',
+    border: 'none',
+    marginLeft: '8px',
+    paddingLeft: '10px',
+    paddingRight: '10px',
+    whiteSpace: 'pre'
+};
+
 export default {
     text: {
         borderColor: 'rgba(255,255,255,0.87)',
@@ -25,65 +35,29 @@ export default {
     startButton: {
         default: {
             backgroundColor: 'rgba(59, 76, 138,1)',
-            color: 'rgba(255,255,255,0.87)',
-            fontSize: '16px',
-            borderRadius: '5px',
-            border: 'none',
-            width: '80px',
-            height: '35px',
-            marginLeft: '8px',
+            ...buttonShared
         },
         hover: {
             backgroundColor: 'rgba(64, 81, 143,1)',
-            color: 'rgba(255,255,255,0.87)',
-            fontSize: '16px',
-            borderRadius: '5px',
-            border: 'none',
-            width: '80px',
-            height: '35px',
-            marginLeft: '8px',
+            ...buttonShared
         },
         press: {
             backgroundColor: 'rgba(67, 86, 156,1)',
-            color: 'rgba(255,255,255,0.87)',
-            fontSize: '16px',
-            borderRadius: '5px',
-            border: 'none',
-            width: '80px',
-            height: '35px',
-            marginLeft: '8px',
+            ...buttonShared
         },
     },
     stopButton: {
         default: {
             backgroundColor: 'rgba(166,127,43,1)',
-            color: 'rgba(255,255,255,0.87)',
-            fontSize: '16px',
-            borderRadius: '8%',
-            border: 'none',
-            width: '80px',
-            height: '35px',
-            marginLeft: '8px',
+            ...buttonShared
         },
         hover: {
             backgroundColor: 'rgba(161,127,53,1)',
-            color: 'rgba(255,255,255,0.87)',
-            fontSize: '16px',
-            borderRadius: '8%',
-            border: 'none',
-            width: '80px',
-            height: '35px',
-            marginLeft: '8px',
+            ...buttonShared
         },
         press: {
             backgroundColor: 'rgba(158,129,65,1)',
-            color: 'rgba(255,255,255,0.87)',
-            fontSize: '16px',
-            borderRadius: '8%',
-            border: 'none',
-            width: '80px',
-            height: '35px',
-            marginLeft: '8px',
+            ...buttonShared
         },
     },
 };
