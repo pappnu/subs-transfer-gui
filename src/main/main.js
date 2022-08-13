@@ -19,6 +19,7 @@ function createWindow() {
         minWidth: 300,
         minHeight: 300,
         webPreferences: {
+            sandbox: false, // TODO refactor preload script to not rely on node
             preload:
                 process.env.NODE_ENV === 'development'
                     ? `${__dirname}/../preload/preload.js`

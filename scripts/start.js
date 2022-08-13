@@ -13,6 +13,9 @@ const LOG_LEVEL = 'warn';
 /** @type {import('vite').InlineConfig} */
 const sharedConfig = {
     mode,
+    server: {
+        port: 3000,
+    },
     build: {
         watch: {},
     },

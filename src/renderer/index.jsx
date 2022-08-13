@@ -1,9 +1,10 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import {createRoot} from 'react-dom/client';
 import {Root} from './components/navigation/root';
 import '../styles/index.css';
 
-ReactDOM.render(
+const root = createRoot(document.getElementById('root'));
+root.render(
     <React.StrictMode>
         <div
             className="index"
@@ -16,5 +17,4 @@ ReactDOM.render(
             <Root />
         </div>
     </React.StrictMode>,
-    document.getElementById('root'),
 );
