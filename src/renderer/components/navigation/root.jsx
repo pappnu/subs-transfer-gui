@@ -13,6 +13,8 @@ import processingSettingsStyles from '../../../styles/processing/settings';
 import processingLayoutStyles from '../../../styles/processing/layout';
 import settingsStyles from '../../../styles/settings/settings';
 import settingsLayoutStyles from '../../../styles/settings/layout';
+import {PlaySvg} from '../graphics/playSvg';
+import {StopSvg} from '../graphics/stopSvg';
 
 let nextPathId = 1;
 
@@ -425,9 +427,36 @@ export class Root extends React.Component {
                                     this.state.processing
                                         ? this.stopProcessing
                                         : this.startProcessing
-                                }
-                                text={this.state.processing ? '■ stop' : '▶   START'}
-                            />
+                                }>
+                                <div
+                                    style={
+                                        this.state.styles.processing.settings
+                                            .iconContainer
+                                    }>
+                                    {this.state.processing ? (
+                                        <StopSvg
+                                            style={
+                                                this.state.styles.processing
+                                                    .settings.icon
+                                            }
+                                        />
+                                    ) : (
+                                        <PlaySvg
+                                            style={
+                                                this.state.styles.processing
+                                                    .settings.icon
+                                            }
+                                        />
+                                    )}
+                                </div>
+                                <div
+                                    style={
+                                        this.state.styles.processing.settings
+                                            .buttonTextContainer
+                                    }>
+                                    {this.state.processing ? 'STOP' : 'START'}
+                                </div>
+                            </StartButton>
                             <StyleableButton
                                 style={this.state.styles.root.menuButton}
                                 text={'–'}

@@ -1,11 +1,13 @@
 const buttonShared = {
+    display: 'flex',
+    flexDirection: 'row',
+    alignItems: 'center',
     color: 'rgba(255,255,255,0.87)',
     fontSize: '14px',
     border: 'none',
-    marginLeft: '8px',
-    paddingLeft: '10px',
-    paddingRight: '10px',
-    whiteSpace: 'pre'
+    width: '90px',
+    paddingLeft: '12px',
+    gap: '10px',
 };
 
 export default {
@@ -32,32 +34,47 @@ export default {
         fontFamily: 'monospace',
         fontSize: '13px',
     },
+    iconContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        width: '10px',
+    },
+    icon: {
+        fill: 'rgba(255,255,255,0.87)',
+    },
+    buttonTextContainer: {
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        flex: 1,
+    },
     startButton: {
         default: {
             backgroundColor: 'rgba(59, 76, 138,1)',
-            ...buttonShared
+            ...buttonShared,
         },
         hover: {
             backgroundColor: 'rgba(64, 81, 143,1)',
-            ...buttonShared
+            ...buttonShared,
         },
         press: {
             backgroundColor: 'rgba(67, 86, 156,1)',
-            ...buttonShared
+            ...buttonShared,
         },
     },
     stopButton: {
         default: {
             backgroundColor: 'rgba(166,127,43,1)',
-            ...buttonShared
+            ...buttonShared,
         },
         hover: {
             backgroundColor: 'rgba(161,127,53,1)',
-            ...buttonShared
+            ...buttonShared,
         },
         press: {
             backgroundColor: 'rgba(158,129,65,1)',
-            ...buttonShared
+            ...buttonShared,
         },
     },
 };

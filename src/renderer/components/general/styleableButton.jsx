@@ -47,6 +47,7 @@ export class StyleableButton extends React.Component {
                 onMouseDown={this.onMouseDown}
                 onMouseUp={this.onMouseUp}
                 onClick={this.props.onClick}>
+                {this.props.children}
                 {this.props.text}
             </button>
         );
