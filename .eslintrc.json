@@ -39,7 +39,8 @@
                 "vars": "all",
                 "args": "none"
             }
-        ]
+        ],
+        "no-shadow": "warn"
     },
     "settings": {
         "react": {
