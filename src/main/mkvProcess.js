@@ -52,7 +52,7 @@ class MkvProcess {
         argumentList.push(this.target);
         argumentList = argumentList.concat(extra_args);
 
-        this.childProcess = spawn(sushiExecutable, argumentList);
+        this.childProcess = spawn(executableParts[0], argumentList);
         this.childProcess.stdout.on('data', (data) =>
             onData({type: 'error', value: data.toString()}),
         );
@@ -155,19 +155,34 @@ class MkvProcess {
                     ...listIds(sourceMkvInfo.tracks, (item) => {
                         return (
                             item.type === 'subtitles' &&
-                            subtitlesLanguages.some((lang) =>
+                            ((subtitlesLanguages.some((lang) =>
                                 item.properties.language
                                     .toLowerCase()
                                     .includes(lang.toLowerCase()),
                             ) &&
-                            (subtitlesNames.length > 0 &&
-                            item.properties.track_name
-                                ? subtitlesNames.some((name) =>
-                                      item.properties.track_name
-                                          .toLowerCase()
-                                          .includes(name.toLowerCase()),
-                                  )
-                                : true)
+                                (subtitlesNames.length > 0 &&
+                                item.properties.track_name
+                                    ? subtitlesNames.some((name) =>
+                                          item.properties.track_name
+                                              .toLowerCase()
+                                              .includes(name.toLowerCase()),
+                                      )
+                                    : true))
+                                    ||
+                                //subtitlesLanguages.some((lang) =>
+                                //    item.properties.language
+                                //        .toLowerCase()
+                                //        .includes(lang.toLowerCase()),
+                                //) ||
+                                (subtitlesNames.length > 0 &&
+                                item.properties.track_name
+                                    ? subtitlesNames.some((name) =>
+                                          item.properties.track_name
+                                              .toLowerCase()
+                                              .includes(name.toLowerCase()),
+                                      )
+                                    : true)
+                                    )
                         );
                     }),
                 );
@@ -179,18 +194,32 @@ class MkvProcess {
                     ...listIds(targetMkvInfo.tracks, (item) => {
                         return (
                             item.type === 'audio' &&
-                            audioLanguages.some((lang) =>
+                            ((audioLanguages.some((lang) =>
                                 item.properties.language
                                     .toLowerCase()
                                     .includes(lang.toLowerCase()),
                             ) &&
-                            (audioNames.length > 0 && item.properties.track_name
-                                ? audioNames.some((name) =>
-                                      item.properties.track_name
-                                          .toLowerCase()
-                                          .includes(name.toLowerCase()),
-                                  )
-                                : true)
+                                (audioNames.length > 0 &&
+                                item.properties.track_name
+                                    ? audioNames.some((name) =>
+                                          item.properties.track_name
+                                              .toLowerCase()
+                                              .includes(name.toLowerCase()),
+                                      )
+                                    : true)) ||
+                                audioLanguages.some((lang) =>
+                                    item.properties.language
+                                        .toLowerCase()
+                                        .includes(lang.toLowerCase()),
+                                ) ||
+                                (audioNames.length > 0 &&
+                                item.properties.track_name
+                                    ? audioNames.some((name) =>
+                                          item.properties.track_name
+                                              .toLowerCase()
+                                              .includes(name.toLowerCase()),
+                                      )
+                                    : true))
                         );
                     }),
                 );
@@ -365,17 +394,18 @@ class MkvProcess {
         if (settings.sushiArgs) {
             sushiArgs = sushiArgs.concat(settings.sushiArgs.split(' '));
         }
-        const sushiOutPath = path.join(
-            path.dirname(this.target),
-            'output',
-            path.basename(this.target) + '.sushi.ass',
-        );
-        // TODO create only directory
-        fs.closeSync(fs.openSync(sushiOutPath, 'w'));
+        try {
+            fs.mkdirSync(path.join(path.dirname(this.target), 'output'));
+        } catch (error) {
+            if (error.code !== 'EEXIST') {
+                throw error;
+            }
+        }
         sushiArgs.push(
-            `-o ${path.join(
+            `-o${path.join(
                 path.dirname(this.target),
                 'output',
+                // TODO automatically determine subtitle format
                 path.basename(this.target) + '.sushi.ass',
             )}`,
         );
@@ -459,8 +489,8 @@ async function retrieveMkvInfo(
         const {stdout} = await promisifiedExecFile(
             mkvMergeExecutable,
             ['--identify', mkv, '--identification-format', format],
-            {maxBuffer: 5242880},
-        ); // 5 MB, process is killed if output exceeds this
+            {maxBuffer: 10485760},
+        ); // 10 MB, process is killed if output exceeds this
 
         if (json) {
             out = JSON.parse(stdout);
