@@ -1,3 +1,2 @@
-sushi-sub
+sushi-sub-next
 opencv-python
-numpy

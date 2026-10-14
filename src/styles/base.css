@@ -1,0 +1,40 @@
+:root {
+  --color-surface: #252526;
+  --color-surface-raised: #2d2d30;
+  --color-surface-input: #3c3c3c;
+  --color-border: #3f3f46;
+  --color-text: #d4d4d4;
+  --color-muted: #9d9d9d;
+  --color-accent: #0e639c;
+  --color-accent-hover: #1177bb;
+  --color-background-panel: #1e1e1e;
+  --color-border-hover: #606068;
+  --color-surface-hover: #37373a;
+  --color-focus: #007fd4;
+  --color-disabled: #747474;
+  --color-scrollbar: #555;
+  --color-white: #fff;
+  --color-danger: #a1260d;
+  --color-transparent: transparent;
+  --color-row-hover: #2a2d2e;
+  --color-danger-hover: #f48771;
+  --color-empty: #777;
+  --color-shadow: #0008;
+  --color-heading-accent: #e5c07b;
+  --color-label: #c5c5c5;
+  --color-line-number: #858585;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+}
+
+ul,
+li,
+ol {
+  list-style: none;
+}

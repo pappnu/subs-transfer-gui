@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "rootDir": "./",
+    "allowJs": true
+  },
+  "extends": ["./tsconfig.json"],
+  "include": ["eslint.config.mjs", ".prettierrc.js", "vite.config.ts"]
+}
